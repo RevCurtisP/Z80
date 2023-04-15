@@ -1,4 +1,4 @@
-;RTC Chip Read/Write Stub
+;RTC Chip Read/Write Base Module
 ;For use with String Conversion Module rtc_str.asm
 ;
 ;Copy and modify for specific RTC chip
@@ -33,6 +33,15 @@
 ;5 DD  Day
 ;6 MM  Month 
 ;7 YY  Year
+
+;Initialize Real Time Clock
+;Args: HL = Address of RTC Normalized Data Structure 
+;Destroys: ???
+;Returns: A = 0 if Successful, otherwise $FF
+;         DE and HL unchanged
+rtc_init:
+    ld     a,$FF       ;Return Failure
+    ret
 
 ;Read Real Time Clock
 ;Args: HL = Address of RTC Normalized Data Structure 

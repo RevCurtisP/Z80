@@ -14,11 +14,11 @@
 ;        May be used as an extra overflow byte
 ;
 
-;Date String Structure (period is null terminator
+;Date String Structure: 17 bytes (14 unformatted)
 ;      Raw: YYMMDDHHmmsscc.  
 ;Formatted: YYYY-MM-DD HH:mm.
 ;   Offset: 01234567890123456
-;. is null terminator
+;* period denotes null terminator
 
 ;Convert BCD Date to Formatted Date String
 ;Args: HL = Address of RTC Data 
@@ -59,6 +59,7 @@ rtc_fmt_str:
         dec     hl
         pop     de                ;Restore Registers
         pop     hl                
+        xor     a                 ;Return Success
         ret
     
 ;Move Characters from Raw to Formatted (Moving Backwards)
@@ -128,7 +129,7 @@ str_to_rtc:
         push    de
         ld      bc,7              ;Start at RTC Field 7 (Year)
         add     hl,bc             
-        ld      b,6               ;and Process 6 Fields
+        ld      b,c               ;and Process 7 Fields
 str_rtc_loop: 
         call    str_rtc_digit     ;Get Tens Digit
         sla     a                 ;Shift to High Nybble
@@ -145,53 +146,21 @@ str_rtc_loop:
         ld      (hl),a            
         pop     de                ;Restore Arguments
         pop     hl
-        jr      rtc_validate      ;then Execute Validation Routine
+        jp      rtc_validate      ;then Execute Validation Routine
 
 ;Return Binary Value of ASCII Digit at DE, Error Out if Not Digit
 str_rtc_digit:
         ld      a,(de)            ;Get ASCII Digit
         sub     '0'               ;Convert to Binary Value
-        jr      c,rtc_err_pop     ;Error if Less than '0'
+        jr      c,str_rtc_err     ;Error if Less than '0'
         cp      ':'
-        jr      nc,rtc_err_pop    ;Error if Greater than '9'
+        jr      nc,str_rtc_err    ;Error if Greater than '9'
         inc     de                ;Move to Next Digit
         ret
         
-;Validate RTC fields 
-;Args: HL = Address of RTC Data Structure
-;Returns: A = 0 if Date and Time are Valid, otherwise $FF
-;         DE and HL unchanged
-rtc_validate:
-        push    hl                ;Save Arguments
-        push    de
-        inc     hl                
-        inc     hl
-        ld      d,h               ;DE = Address of RTC Field 2 (Seconds)
-        ld      e,l
-        ld      hl,rtc_bounds     ;Field Min/Max Values
-        ld      b,5
-rtc_val_loop:
-        ld      a,(de)            ;Get RTC Byte
-        cp      (hl)              ;If < Than Lower Bound
-        jr      c,rtc_ret_err     ;  Error Out
-        inc     hl
-        cp      (hl)              ;If >= Upper Bound
-        jr      nc,rtc_ret_err    ;  Error Out
-        inc     hl                ;
-        inc     de                ;Move to Next RTC Byte
-        djnz    rtc_val_loop      ;and Check It
-        xor     a                 ;No Errors - Return Success
-        pop     de                ;after Restoring Arguments
-        pop     hl
-        ret                       
-
-rtc_err_pop:
+str_rtc_err:
         pop     bc                ;Discard Subroutine Return Address
-rtc_ret_err:
         ld      a,$FF             ;Date Format Error
         pop     de                ;Restore Arguments
         pop     hl
         ret                       ;All Done
-
-rtc_bounds:     ;seconds minutes    hour     day     month
-        .byte   $00,$60, $00,$60, $00,$24, $01,$32, $01,$13
