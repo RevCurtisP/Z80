@@ -51,6 +51,7 @@ rtc_read:
     ret
 rtc_read_fail:
     ld      a,$FF             ;Return Failure
+    or      a
     ret
 
 ;Write Real Time Clock

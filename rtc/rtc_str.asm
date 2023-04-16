@@ -33,6 +33,9 @@ rtc_to_fmt:
 ;Args: DE = Address of String Buffer
 ;Destroys AF, BC
 rtc_fmt_str: 
+        ld      a,(de)            ;If Date is Empty String
+        or      a                 ;  just Return 
+        ret     z                 
         push    hl                ;Save Registers
         push    de
         ld      h,d               ;DE = Start Position in Raw String
