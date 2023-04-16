@@ -78,7 +78,7 @@ rtc_str_mov:
         ret
 
 ;Convert RTC Date to Unformatted Date String
-;Args: HL = Address of RTC Data 
+;Args: HL = Address of RTC Buffer
 ;      DE = Address of Date String Buffer
 ;Destroys: AF, BC
 ;Returns: DE and HL unchanged
@@ -118,7 +118,7 @@ rtc_str_loop:
         ret
 
 ;Convert Raw Date String to RTC Date
-;Args: HL = Base Address of RTC Fields
+;Args: HL = Base Address of RTC Buffer
 ;      DE = Address of Date String Buffer
 ;           Must be in format YYMMDDHHmmss (any following characters are ignored)
 ;Destroys: BC
