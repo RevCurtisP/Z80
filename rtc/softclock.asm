@@ -10,22 +10,21 @@
 ;+5 DD  Day
 ;+6 MM  Month 
 ;+7 YY  Year
-;+8 cd0 Countdown       Set to 0 after RTC Read/Write
-;+9 cd1 Countdown        
+;+8 cdl Countdown LSB   Set to 0 after RTC Read/Write
+;+9 cdh Countdown MSB      
 
 ;Initialize Real Time Clock
-;  Fills date-time buffer with zeros
-;  causing following reads to return RTC Not Found
-;Args: BC = Address of Software Clock 
-;      DE = Default Time
+;  Sets SoftClock fields as specified
+;Args: BC = Address of Software Clock
+;      HL = Initial RTC Data
 ;Returns: A = 0 if Successful, otherwise $FF
 ;         BC, DE, HL unchanged
 rtc_init:
     push    hl            ;Save Registers
     push    de
     push    bc 
-    ld      h,b           
-    ld      l,c
+    ld      d,b           
+    ld      e,c
     ld      bc,10         ;Copy All Fields
     ldir                  
     pop     bc            ;Restore Registers
@@ -41,9 +40,9 @@ rtc_init:
 rtc_read:
     ld      a,(bc)            ;Check RTC Found flag
     or      a                 ;If 0 (Not Found)
-    jr      nz,do_rtc_read    ;  
-    ld      (hl),a            ;Make DTM is Invalid
-    dec     a                 ;and Return Failure
+    jr      nz,do_rtc_read    ;  return Failure
+    ld      (hl),a            ;DTM is Invalid
+    dec     a
     ret
 do_rtc_read:
     push    hl            ;Save Registers
@@ -53,7 +52,7 @@ do_rtc_read:
     ld      e,l
     ld      h,b           ;Copying from SoftClock
     ld      l,c
-    ld      bc,8           ;Copying 8 Bytes
+    ld      bc,8          ;Copying 8 Bytes
     ldir                  ;Do Copy
     pop     bc            ;Restore Registers
     pop     de
@@ -70,8 +69,8 @@ rtc_write:
     push    hl            ;Save Registers
     push    de            
     push    bc 
-    ld      d,b           ;Copying from SoftClock
-    ld      e,c           ;Copying to DTM Buffer
+    ld      d,b           ;Copying DTM Buffer
+    ld      e,c           ;Copying to Software
     ld      bc,8          ;Copying 8 Bytes
     ldir                  ;Do Copy
     xor     a             ;Clear Countdown 
@@ -83,4 +82,3 @@ rtc_write:
     pop     hl
     ret                 
 
-;

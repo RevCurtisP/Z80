@@ -130,16 +130,15 @@ dtm_str_loop:
 ;Args: HL = Address of DTM Buffer
 ;      DE = Address of String Buffer
 ;           Must be in format YYMMDDHHmmss (any following characters are ignored)
-;Destroys: BC
-;Returns: A = 0 if Successful, $FF if Date String is Invalid
-;         DE and HL unchanged
+;Returns: A=0, Z=1 if Successful, A=$FF, Z=0 if not
+;         BC, DE, HL unchanged
 str_to_dtm:
         push    hl                ;Save Arguments
         push    de
         push    bc
         ld      bc,7              ;Start at RTC Field 7 (Year)
         add     hl,bc             
-        ld      b,c               ;and Process 7 Fields
+        ld      b,6               ;and Process 6 Fields
 str_dtm_loop: 
         call    str_dtm_digit     ;Get Tens Digit
         sla     a                 ;Shift to High Nybble
@@ -181,7 +180,7 @@ str_dtm_err:
 ;Args: HL = Address of DTM Buffer
 ;Destroys: BC
 ;Returns: A=0, Z=1 if Successful, A=$FF, Z=0 if not
-;         DE and HL unchanged
+;         BC, DE, HL unchanged
 dtm_validate:
         push    hl                ;Save Arguments
         push    de
