@@ -1,21 +1,17 @@
-;RTC Chip Null Driver
-;Simulate RTC Chip I/O for testing
+;RTC Software Clock
 ;
-;This module assumes that the contents of the date-time buffer
-;does not change between reads and writes 
 
-
-;RTC Date-Time Buffer
-;+0 fnd RTC Found     $FF if found, else 0
+;RTC Software clock
+;+0 enl Enabled         $FF if enabled, else 0
 ;+1 cc  Centiseconds
 ;+2 ss  Seconds
 ;+3 mm  Minutes
-;+4 HH  Hour         24 Hour Format
+;+4 HH  Hour            24 Hour Format
 ;+5 DD  Day
 ;+6 MM  Month 
 ;+7 YY  Year
-;+8     Unused       
-;+9 ovf Overflow     Set to 0 after RTC Read/Write
+;+8 cd0    Countdown       
+;+9 cd1 Countdown       Set to 0 after RTC Read/Write
 
 ;Initialize Real Time Clock
 ;  Fills date-time buffer with zeros
