@@ -15,7 +15,7 @@
 ;+5 DD  Day
 ;+6 MM  Month 
 ;+7 YY  Year
-;+8 WD  Weekday      Supported by some RTC chips
+;+8 WD  Weekday      1-7 if supported, 0 if not
 ;+9 ovf Overflow     Set to 0 after RTC Read/Write
 
 
