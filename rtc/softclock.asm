@@ -64,7 +64,7 @@ do_rtc_read:
 ;Args: HL = Address of DTM Buffer 
 ;      BC = Address of Software Clock 
 ;Returns: A=0, Z=1 if Successful, A=$FF, Z=0 if not
-;         DE and HL unchanged
+;         BC, DE, HL unchanged
 rtc_write:
     push    hl            ;Save Registers
     push    de            
@@ -82,3 +82,16 @@ rtc_write:
     pop     hl
     ret                 
 
+;Advance Software Clock
+;      BC = Address of Software Clock 
+;Returns: BC, DE, HL unchanged
+rtc_tick:
+    ret                   ;Do Nothing  - for now
+    push    hl            ;Save Registers
+    push    de            
+    push    bc 
+ 
+    pop     bc            ;Restore Registers
+    pop     de
+    pop     hl
+    ret                 
